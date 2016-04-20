@@ -1,0 +1,454 @@
+#include <iostream>
+#include <cmath>
+#include <string>
+using namespace std;
+
+
+class Point { //Creates class for points(struct would work too)
+public:
+	double x;
+	double y;
+};
+
+bool check(Point a, Point arry[], int aSize, double margin) { //Checks if a given point is in 
+	bool is = false;										  //an array of points to a certain 	
+	for (int t = 0; t < aSize; t++) {						  //margin of error	
+		if ((abs(a.x - arry[t].x) <= margin) && (abs(a.y - arry[t].y) <= margin)) {
+			is = true;
+		}
+	}
+	return is;
+}
+void plot75x75(Point arry[], double xMax, double yMax, double xMin, double yMin) {
+	cout << "\n\n\n";
+	Point a[55][75];            //Main plotting function; creates point array for window
+	double c = xMin;            //following sequence gives x and y values to all of te points in the array
+	double f = yMax;            //function receives an array of points created by tabStore function(later in code)
+	double yGap = (yMax - yMin) / 55;
+	double gap = (xMax - xMin) / 75;
+	double yScale = (yMax - yMin) / 4;
+	double xScale = (xMax - xMin) / 4;
+	for (int d = 0; d < 55; d++) {
+		for (int e = 0; e < 75; e++) {
+			a[d][e].x = c;
+			a[d][e].y = f;
+			c += gap;
+		}
+		f -= yGap;
+		c = xMin;
+	}
+	double yAxisMark = 0;     //figures out where to put the y-axis
+	for (int o = 0; o < 75; o++) {
+		if (abs(a[0][o].x) < (gap / 2)) {
+			yAxisMark = o;
+		}
+	}
+	cout << "X-scale = " << xScale << endl;
+	cout << "Y-scale = " << yScale << endl;
+	for (int o = 0; o < yAxisMark; o++) {
+		cout << " ";
+	}
+	cout << "Y\n\n";
+	for (int d = 0; d < 55; d++) {        //Main plottig sequence 
+		for (int e = 0; e < 75; e++) {
+			if (check(a[d][e], arry, 75, (yGap / 2))) { //Checks if each point is in the given array
+				cout << "*";                            //If so, prints an asterisk
+			}
+			else if ((a[d][e].y < (yGap / 2)) && (a[d][e].y >= -(yGap / 2))) {
+				if (e == 37 || e == 18 || e == 55) {
+					cout << "+";
+				}
+				else {
+					cout << "-";           // if y-value is 0, prints x-axis
+				}
+				if (e == 74) {
+					cout << " X";
+				}
+			}
+			else if ((a[d][e].x <= (gap / 2)) && (a[d][e].x >= -(gap / 2))) {
+				if (d == 14 || d == 42) {
+					cout << "+";
+				}
+				else {
+					cout << "|";	//if x-value is 0, prints y-axis
+				}
+			}
+			else {
+				cout << " ";       //otherwise, prints blank space
+			}
+
+		}
+		cout << endl;
+	}
+}
+
+class LinFunc {
+public:
+	LinFunc(double, double);       //Class for linear functions
+	void tabStore(Point[], double, double); //Creates table of points to be used by plotting function
+private:
+	double m;   //coefficients for linear function
+	double b;
+};
+
+LinFunc::LinFunc(double x, double y) {
+	m = x;
+	b = y;
+}
+
+void LinFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double a = xMin;                //a represents the x value
+	double xGap = (xMax - xMin) / 75;      //the rest of the tabStore functions work the same way
+	for (int c = 0; c < 75; c++) {
+		arry[c].x = a;
+		arry[c].y = (m * a) + b;
+		a += xGap;
+	}
+}
+
+class SinFunc {
+public:
+	SinFunc(double, double, double, double);
+	void tabStore(Point[], double, double);
+private:
+	double a;
+	double b;
+	double c;
+	double d;
+};
+
+class CubeFunc {
+public:
+	CubeFunc(double, double, double, double);
+	void tabStore(Point[], double, double);
+private:
+	double a;
+	double b;
+	double c;
+	double d;
+};
+
+CubeFunc::CubeFunc(double w, double x, double y, double z) {
+	a = w;
+	b = x;
+	c = y;
+	d = z;
+}
+
+void CubeFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double f = xMin;
+	double xGap = (xMax - xMin) / 75;
+	for (int w = 0; w < 75; w++) {
+		arry[w].x = f;
+		arry[w].y = (a * pow(f, 3)) + (b * pow(f, 2)) + (c * f) + d;
+		f += xGap;
+	}
+}
+
+SinFunc::SinFunc(double w, double x, double y, double z) {
+	a = w;
+	b = x;
+	c = y;
+	d = z;
+}
+
+void SinFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double t;
+	t = xMin;
+	double xGap = (xMax - xMin) / 75;
+	for (int w = 0; w < 75; w++) {
+		arry[w].x = t;
+		arry[w].y = (a * sin(b * (t - c))) + d;
+		t += xGap;
+	}
+}
+
+class QuadFunc {
+public:
+	QuadFunc(double, double, double);
+	void tabStore(Point[], double, double);
+private:
+	double a;
+	double b;
+	double c;
+};
+
+QuadFunc::QuadFunc(double x, double y, double z) {
+	a = x;
+	b = y;
+	c = z;
+}
+
+void QuadFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double f = xMin;
+	double xGap = (xMax - xMin) / 75;
+	for (int w = 0; w < 75; w++) {
+		arry[w].x = f;
+		arry[w].y = (a * pow(f, 2)) + (b * f) + c;
+		f += xGap;
+	}
+}
+
+class QuartFunc {
+public:
+	QuartFunc(double, double, double, double, double);
+	void tabStore(Point[], double, double);
+private:
+	double a;
+	double b;
+	double c;
+	double d;
+	double e;
+};
+
+QuartFunc::QuartFunc(double v, double w, double x, double y, double z) {
+	a = v;
+	b = w;
+	c = x;
+	d = y;
+	e = z;
+}
+
+void QuartFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double f = xMin;
+	double xGap = (xMax - xMin) / 75;
+	for (int w = 0; w < 75; w++) {
+		arry[w].x = f;
+		arry[w].y = (a * pow(f, 4)) + (b * pow(f, 3)) + (c * pow(f, 2)) + (d * f) + e;
+		f += xGap;
+	}
+}
+
+class DamSinFunc {
+public:
+	DamSinFunc(double, double, double, double);
+	void tabStore(Point[], double, double);
+private: // y = a(e^-kx)sin(bx) + c
+	double a;
+	double b;
+	double c;
+	double k;
+};
+
+DamSinFunc::DamSinFunc(double w, double x, double y, double z) {
+	a = w;
+	b = x;
+	c = y;
+	k = z;
+}
+
+void DamSinFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double f = xMin;
+	double e = 2.71828182845904523536;
+	double xGap = (xMax - xMin) / 75;
+	for (int w = 0; w < 75; w++) {
+		arry[w].x = f;
+		arry[w].y = (a * pow(e, (-1 * k * f)) * sin(b * f)) + c;
+		f += xGap;
+	}
+}
+
+class QuintFunc {
+public:
+	QuintFunc(double, double, double, double, double, double);
+	void tabStore(Point[], double, double);
+private:
+	double a;
+	double b;
+	double c;
+	double d;
+	double e;
+	double f;
+};
+void QuintFunc::tabStore(Point arry[], double xMin, double xMax) {
+	double g = xMin;
+	double xGap = (xMax - xMin) / 75;
+	for (int w = 0; w < 75; w++) {
+		arry[w].x = g;
+		arry[w].y = (a * pow(g, 5)) + (b * pow(g, 4)) + (c * pow(g, 3)) + (d * pow(g, 2)) + (e * g) + f;
+		g += xGap;
+	}
+}
+
+QuintFunc::QuintFunc(double aa, double bb, double cc, double dd, double ee, double ff) {
+	a = aa;
+	b = bb;
+	c = cc;
+	d = dd;
+	e = ee;
+	f = ff;
+}
+
+int main() {
+	Point arry[75];
+	cout << "Welcome to Poor man's Desmos.\n";
+	cout << "Press 1 for linear functions.\nPress 2 for quadratic functions\n"
+		<< "Press 3 for cubic functions.\nPress 4 for quartic functions.\n"
+		<< "Press 5 for sine functions.\nPress 6 for dampened sine functions.\n"
+		<< "Press 7 for quintic functions.\n";
+	int input;  //decides what type of function to plot
+	cin >> input;
+	if (input == 1) {
+		cout << "y = mx + b\nEnter m and b\n";
+		double m, b;
+		cin >> m >> b;
+		LinFunc func(m, b);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {	//fixes if the user inputs values in wrong order
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	else if (input == 2) {
+		cout << "y = ax^2 + bx + c\nEnter a, b, and c.\n";
+		double a, b, c;
+		cin >> a >> b >> c;
+		QuadFunc func(a, b, c);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	else if (input == 3) {
+		cout << "y = ax^3 + bx^2 + cx + d\nEnter m and b\n";
+		double a, b, c, d;
+		cin >> a >> b >> c >> d;
+		CubeFunc func(a, b, c, d);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	else if (input == 4) {
+		cout << "y = ax^4 + bx^3 + cx^2 + dx + e\nEnter a, b, c, d, and e.\n";
+		double a, b, c, d, e;
+		cin >> a >> b >> c >> d >> e;
+		QuartFunc func(a, b, c, d, e);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	else if (input == 5) {
+		cout << "y = asin(b(x - c)) + d\nEnter a, b, c, and d.\n";
+		double a, b, c, d;
+		cin >> a >> b >> c >> d;
+		SinFunc func(a, b, c, d);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	else if (input == 6) {
+		cout << "y = a(e^-kx)sin(bx) + c\nEnter a, b, c, and k.\n";
+		double a, b, c, k;
+		cin >> a >> b >> c >> k;
+		DamSinFunc func(a, b, c, k);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	else if (input == 7) {
+		cout << "y = ax^5 + bx^4 + cx^3 + dx^2 + ex + f\nEnter a, b, c, d, e, and f.\n";
+		double a, b, c, d, e, f;
+		cin >> a >> b >> c >> d >> e >> f;
+		QuintFunc func(a, b, c, d, e, f);
+		double xx, x, yy, y;
+		cout << "Enter the x minimum and maximum.\n";
+		cin >> x >> xx;
+		if (x > xx) {
+			double temp = x;
+			x = xx;
+			xx = temp;
+		}
+		cout << "Enter the y minimum and maximum.\n";
+		cin >> y >> yy;
+		if (y > yy) {
+			double temp = y;
+			y = yy;
+			yy = temp;
+		}
+		func.tabStore(arry, x, xx);
+		plot75x75(arry, xx, yy, x, y);
+	}
+	system("pause");
+	return 1;
+}
